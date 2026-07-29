@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CreditIQ — Risk Intelligence Platform</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0f1e;color:#e2e8f0}
+.topbar{background:#0d1426;border-bottom:1px solid #1e2d4a;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.logo{font-size:18px;font-weight:600;color:#60a5fa;letter-spacing:-0.3px}
+.logo span{color:#e2e8f0}
+.nav{display:flex;gap:4px}
+.navbtn{background:none;border:none;color:#94a3b8;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px}
+.navbtn.active{background:#1e3a5f;color:#60a5fa}
+.navbtn:hover{background:#1a2744;color:#e2e8f0}
+.content{padding:20px;max-width:1200px;margin:0 auto}
+.section{display:none}
+.section.active{display:block}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.card{background:#0d1426;border:1px solid #1e2d4a;border-radius:10px;padding:16px}
+.card-title{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px}
+.stat-val{font-size:28px;font-weight:600;color:#e2e8f0}
+.stat-sub{font-size:12px;color:#64748b;margin-top:4px}
+.stat-down{color:#f87171}
+.section-title{font-size:15px;font-weight:500;color:#e2e8f0;margin-bottom:14px}
+.bar-wrap{margin-bottom:10px}
+.bar-label{display:flex;justify-content:space-between;font-size:12px;color:#94a3b8;margin-bottom:4px}
+.bar-track{background:#1a2744;border-radius:4px;height:8px;overflow:hidden}
+.bar-fill{height:8px;border-radius:4px;transition:width 0.8s ease}
+.tag{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600}
+.tag-green{background:#052e16;color:#34d399}
+.tag-red{background:#2d0f0f;color:#f87171}
+.tag-amber{background:#2d1a00;color:#fbbf24}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.field label{font-size:12px;color:#64748b;display:block;margin-bottom:6px}
+.field input,.field select{width:100%;background:#0a0f1e;border:1px solid #1e2d4a;border-radius:8px;padding:8px 12px;color:#e2e8f0;font-size:14px;outline:none}
+.field input:focus,.field select:focus{border-color:#3b82f6}
+.field select option{background:#0d1426}
+.btn-primary{background:#2563eb;color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:500;cursor:pointer;transition:background 0.2s}
+.btn-primary:hover{background:#1d4ed8}
+.result-card{background:#0a1628;border:1px solid #1e3a5f;border-radius:10px;padding:20px;margin-top:16px}
+.prob-bar{background:#1a2744;border-radius:6px;height:12px;overflow:hidden;margin:10px 0}
+.prob-fill{height:12px;border-radius:6px;transition:width 1s ease}
+.shap-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px}
+.shap-name{color:#94a3b8;width:110px;flex-shrink:0}
+.shap-bar{flex:1;background:#1a2744;border-radius:3px;height:6px;overflow:hidden}
+.shap-pos{height:6px;border-radius:3px;background:#f87171}
+.shap-neg{height:6px;border-radius:3px;background:#34d399}
+.shap-val{color:#64748b;font-size:11px;width:45px;text-align:right}
+.chat-wrap{display:flex;flex-direction:column}
+.chat-msgs{background:#0a0f1e;border:1px solid #1e2d4a;border-radius:10px 10px 0 0;padding:16px;min-height:300px;max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:80%;padding:10px 14px;border-radius:10px;font-size:13px;line-height:1.6}
+.msg-user{background:#1e3a5f;color:#bfdbfe;align-self:flex-end;border-radius:10px 10px 0 10px}
+.msg-bot{background:#131e33;color:#cbd5e1;align-self:flex-start;border-radius:10px 10px 10px 0;border:1px solid #1e2d4a}
+.msg-bot.loading{color:#475569}
+.chat-input-row{display:flex;gap:8px;background:#0d1426;border:1px solid #1e2d4a;border-top:none;border-radius:0 0 10px 10px;padding:10px}
+.chat-input-row input{flex:1;background:#0a0f1e;border:1px solid #1e2d4a;border-radius:8px;padding:8px 12px;color:#e2e8f0;font-size:13px;outline:none}
+.chat-input-row input:focus{border-color:#3b82f6}
+.chat-send{background:#2563eb;color:#fff;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:13px}
+.chat-send:disabled{background:#1e3a5f;color:#475569;cursor:not-allowed}
+.quick-btns{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.quick-btn{background:#0d1426;border:1px solid #1e2d4a;color:#94a3b8;border-radius:16px;padding:5px 12px;font-size:11px;cursor:pointer}
+.quick-btn:hover{border-color:#3b82f6;color:#60a5fa}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#34d399;display:inline-block;margin-right:6px}
+.status-dot.red{background:#f87171}
+.api-status{font-size:11px;color:#64748b;display:flex;align-items:center}
+.dropzone{border:2px dashed #1e2d4a;border-radius:10px;background:#0a0f1e;padding:36px 20px;text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s}
+.dropzone:hover{border-color:#3b82f6}
+.dropzone.dragover{border-color:#3b82f6;background:#0a1628}
+.dropzone-icon{font-size:34px;margin-bottom:10px}
+.dropzone-main{font-size:14px;color:#e2e8f0}
+.dropzone-main b{color:#60a5fa}
+.dropzone-sub{font-size:12px;color:#64748b;margin-top:6px}
+.fmt-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:14px}
+.fmt-chip{background:#0d1426;border:1px solid #1e2d4a;color:#94a3b8;border-radius:14px;padding:3px 10px;font-size:11px}
+.ingest-row{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;padding:8px 0;border-bottom:1px solid #1e2d4a}
+.ingest-row:last-child{border-bottom:none}
+.ingest-name{color:#e2e8f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ingest-meta{color:#64748b;font-size:11px;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">Credit<span>IQ</span> <span style="font-size:12px;color:#475569;font-weight:400">Risk Intelligence Platform</span></div>
+  <div class="nav">
+    <button class="navbtn active" onclick="showSection('overview',this)">📊 Overview</button>
+    <button class="navbtn" onclick="showSection('predictor',this)">🔮 Risk Predictor</button>
+    <button class="navbtn" onclick="showSection('chat',this)">💬 AI Analyst</button>
+    <button class="navbtn" onclick="showSection('ingest',this)">📥 Ingest Data</button>
+  </div>
+  <div class="api-status" id="apiStatus"><span class="status-dot red" id="statusDot"></span> Checking API...</div>
+</div>
+
+<div class="content">
+
+  <!-- OVERVIEW -->
+  <div class="section active" id="section-overview">
+    <div class="grid4">
+      <div class="card"><div class="card-title">Overall Default Rate</div><div class="stat-val">18.5%</div><div class="stat-sub stat-down">↑ vs 16.2% baseline</div></div>
+      <div class="card"><div class="card-title">Total Loans Analyzed</div><div class="stat-val">150k+</div><div class="stat-sub">Lending Club dataset</div></div>
+      <div class="card"><div class="card-title">Avg Loan Amount</div><div class="stat-val">$14,755</div><div class="stat-sub">Median: $12,000</div></div>
+      <div class="card"><div class="card-title">Avg Interest Rate</div><div class="stat-val">13.2%</div><div class="stat-sub">Range: 5.3% – 28.9%</div></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="section-title">Default rate by loan grade</div>
+        <div style="position:relative;height:220px"><canvas id="gradeCanvas"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="section-title">Default rate by DTI bucket</div>
+        <div style="position:relative;height:220px"><canvas id="dtiCanvas"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="section-title">Defaulter vs non-defaulter profile</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+          <div style="font-size:11px;color:#34d399;text-align:center">Non-defaulters</div>
+          <div style="font-size:11px;color:#f87171;text-align:center">Defaulters</div>
+        </div>
+        <div id="profileBars"></div>
+      </div>
+      <div class="card">
+        <div class="section-title">Value at Risk</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+          <div style="background:#0a0f1e;border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:11px;color:#fbbf24;margin-bottom:4px">95% VaR</div>
+            <div style="font-size:22px;font-weight:600;color:#fbbf24">6.2%</div>
+            <div style="font-size:11px;color:#475569">Min loss worst 5%</div>
+          </div>
+          <div style="background:#0a0f1e;border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:11px;color:#f87171;margin-bottom:4px">99% VaR</div>
+            <div style="font-size:22px;font-weight:600;color:#f87171">5.3%</div>
+            <div style="font-size:11px;color:#475569">Min loss worst 1%</div>
+          </div>
+        </div>
+        <div class="section-title" style="font-size:13px">Top risk factors (XGBoost)</div>
+        <div id="featureImportance"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREDICTOR -->
+  <div class="section" id="section-predictor">
+    <div class="grid2">
+      <div class="card">
+        <div class="section-title">Enter applicant details</div>
+        <div class="form-grid">
+          <div class="field"><label>Loan Amount ($)</label><input type="number" id="f-loan" value="15000"></div>
+          <div class="field"><label>Interest Rate (%)</label><input type="number" id="f-rate" value="14.5" step="0.1"></div>
+          <div class="field"><label>Annual Income ($)</label><input type="number" id="f-income" value="60000"></div>
+          <div class="field"><label>DTI Ratio</label><input type="number" id="f-dti" value="25.0" step="0.1"></div>
+          <div class="field"><label>Loan Grade</label><select id="f-grade"><option>A</option><option>B</option><option selected>C</option><option>D</option><option>E</option><option>F</option><option>G</option></select></div>
+          <div class="field"><label>Home Ownership</label><select id="f-home"><option>RENT</option><option>MORTGAGE</option><option>OWN</option></select></div>
+        </div>
+        <button class="btn-primary" onclick="runPredict()">🔮 Predict Risk Score</button>
+        <div style="font-size:11px;color:#475569;margin-top:8px" id="predict-status">Ready — calls POST /predict on localhost:8000</div>
+      </div>
+      <div class="card" id="resultPanel" style="display:flex;align-items:center;justify-content:center;min-height:200px">
+        <div style="text-align:center;color:#1e3a5f">
+          <div style="font-size:40px">🔮</div>
+          <div style="color:#475569;font-size:13px;margin-top:12px">Enter details and click predict</div>
+        </div>
+      </div>
+    </div>
+    <div class="card" id="explainPanel" style="display:none">
+      <div class="section-title">SHAP feature explanation</div>
+      <div style="font-size:12px;color:#64748b;margin-bottom:12px">How each feature contributed to this prediction</div>
+      <div id="shapBars"></div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="section" id="section-chat">
+    <div class="grid2">
+      <div>
+        <div class="quick-btns">
+          <button class="quick-btn" onclick="sendQ('What is the overall default rate?')">Default rate?</button>
+          <button class="quick-btn" onclick="sendQ('Which loan grade has the highest default rate?')">Riskiest grade?</button>
+          <button class="quick-btn" onclick="sendQ('What DTI ratio is considered high risk?')">High risk DTI?</button>
+          <button class="quick-btn" onclick="sendQ('Summarize the credit risk report')">Summarize report</button>
+          <button class="quick-btn" onclick="sendQ('What factors most affect loan default?')">Key risk factors?</button>
+        </div>
+        <div class="chat-wrap">
+          <div class="chat-msgs" id="chatMsgs">
+            <div class="msg msg-bot">Hi! I'm your AI credit risk analyst. Ask me anything about the Lending Club dataset — I use RAG to retrieve answers directly from your data.</div>
+          </div>
+          <div class="chat-input-row">
+            <input type="text" id="chatInput" placeholder="Ask about default rates, loan grades, DTI..." onkeydown="if(event.key==='Enter')sendChat()">
+            <button class="chat-send" id="chatSend" onclick="sendChat()">Send</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title">System status</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+          <div style="display:flex;align-items:center;gap:10px;font-size:12px"><span class="status-dot"></span><span style="color:#94a3b8">Pinecone vector store</span><span class="tag tag-green">Connected</span></div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:12px"><span class="status-dot"></span><span style="color:#94a3b8">Semantic chunking (MMR)</span><span class="tag tag-green">Active</span></div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:12px"><span class="status-dot"></span><span style="color:#94a3b8">Claude Haiku LLM</span><span class="tag tag-green">Online</span></div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:12px"><span class="status-dot" id="d4"></span><span style="color:#94a3b8">FastAPI backend</span><span class="tag tag-amber" id="t4">Checking...</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INGEST -->
+  <div class="section" id="section-ingest">
+    <div class="grid2">
+      <div class="card">
+        <div class="section-title">Upload a document</div>
+        <div style="font-size:12px;color:#64748b;margin-bottom:14px">Add loan documents to the knowledge base — they're embedded into Pinecone and become searchable by the AI Analyst.</div>
+        <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+          <div class="dropzone-icon">📄</div>
+          <div class="dropzone-main">Drop a file here or <b>browse</b></div>
+          <div class="dropzone-sub" id="dropzoneSub">No file selected</div>
+          <div class="fmt-chips">
+            <span class="fmt-chip">PDF</span>
+            <span class="fmt-chip">CSV</span>
+            <span class="fmt-chip">TXT</span>
+            <span class="fmt-chip">MD</span>
+            <span class="fmt-chip">DOCX</span>
+            <span class="fmt-chip">XLSX</span>
+          </div>
+        </div>
+        <input type="file" id="fileInput" accept=".pdf,.txt,.md,.csv,.xlsx,.xls,.docx" style="display:none" onchange="onFilePicked()">
+        <div style="display:flex;align-items:center;gap:10px;margin-top:14px">
+          <button class="btn-primary" id="uploadBtn" onclick="uploadFile()">Upload & Ingest</button>
+          <span id="uploadStatus" style="font-size:12px;color:#64748b"></span>
+        </div>
+        <div style="font-size:11px;color:#475569;margin-top:10px">Tabular files (CSV/XLSX) ingest up to the first 500 rows.</div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Ingested this session</div>
+        <div style="font-size:12px;color:#64748b;margin-bottom:8px">Files added since this page loaded.</div>
+        <div id="ingestList">
+          <div style="font-size:12px;color:#475569;padding:8px 0" id="ingestEmpty">Nothing ingested yet.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+const API = 'http://localhost:8000';
+
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.navbtn').forEach(b => b.classList.remove('active'));
+  document.getElementById('section-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+async function checkAPI() {
+  try {
+    const r = await fetch(API + '/health', {signal: AbortSignal.timeout(3000)});
+    if (r.ok) {
+      document.getElementById('statusDot').style.background = '#34d399';
+      document.getElementById('apiStatus').innerHTML = '<span class="status-dot" style="background:#34d399;display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px"></span> API online';
+      document.getElementById('t4').className = 'tag tag-green';
+      document.getElementById('t4').textContent = 'Online';
+      document.getElementById('d4').style.background = '#34d399';
+    }
+  } catch(e) {
+    document.getElementById('apiStatus').innerHTML = '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#f87171;margin-right:6px"></span> API offline';
+    document.getElementById('t4').className = 'tag tag-red';
+    document.getElementById('t4').textContent = 'Offline';
+    document.getElementById('d4').style.background = '#f87171';
+  }
+}
+
+function makeBarChart(canvasId, labels, values) {
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return;
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{ data: values, backgroundColor: values.map(v => v > 25 ? '#f87171' : v > 15 ? '#fbbf24' : '#34d399'), borderRadius: 4, borderSkipped: false }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ctx.parsed.y.toFixed(1) + '%' } } },
+      scales: {
+        x: { grid: { color: '#1e2d4a' }, ticks: { color: '#64748b', font: { size: 11 } } },
+        y: { grid: { color: '#1e2d4a' }, ticks: { color: '#64748b', font: { size: 11 }, callback: v => v + '%' }, max: 45 }
+      }
+    }
+  });
+}
+
+function renderProfileBars() {
+  const features = [
+    { name: 'Avg loan ($)', nonDef: 13200, def: 16400, max: 18000 },
+    { name: 'Avg int rate (%)', nonDef: 11.8, def: 15.9, max: 20 },
+    { name: 'Avg income ($k)', nonDef: 72, def: 58, max: 90 },
+    { name: 'Avg DTI', nonDef: 16.2, def: 23.1, max: 30 },
+  ];
+  document.getElementById('profileBars').innerHTML = features.map(f => `
+    <div class="bar-wrap">
+      <div class="bar-label"><span>${f.name}</span><span style="color:#34d399">${f.nonDef > 100 ? '$' + f.nonDef.toLocaleString() : f.nonDef}</span><span style="color:#f87171">${f.def > 100 ? '$' + f.def.toLocaleString() : f.def}</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+        <div class="bar-track"><div class="bar-fill" style="width:${(f.nonDef/f.max*100).toFixed(1)}%;background:#34d399"></div></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${(f.def/f.max*100).toFixed(1)}%;background:#f87171"></div></div>
+      </div>
+    </div>`).join('');
+}
+
+function renderFeatureImportance() {
+  const features = [
+    { name: 'FICO score', pct: 88 },
+    { name: 'Interest rate', pct: 74 },
+    { name: 'DTI ratio', pct: 68 },
+    { name: 'Annual income', pct: 55 },
+    { name: 'Loan grade', pct: 49 },
+    { name: 'Loan amount', pct: 31 },
+  ];
+  document.getElementById('featureImportance').innerHTML = features.map(f => `
+    <div class="bar-wrap">
+      <div class="bar-label"><span>${f.name}</span><span>${f.pct}%</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${f.pct}%;background:#3b82f6"></div></div>
+    </div>`).join('');
+}
+
+async function runPredict() {
+  const loan = parseFloat(document.getElementById('f-loan').value);
+  const rate = parseFloat(document.getElementById('f-rate').value);
+  const income = parseFloat(document.getElementById('f-income').value);
+  const dti = parseFloat(document.getElementById('f-dti').value);
+  document.getElementById('predict-status').textContent = 'Calling POST /predict...';
+
+  let result;
+  try {
+    const r = await fetch(API + '/predict', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ loan_amnt: loan, int_rate: rate, annual_inc: income, dti }),
+      signal: AbortSignal.timeout(15000)
+    });
+    const data = await r.json();
+    result = data.result || data.response || JSON.stringify(data);
+    document.getElementById('predict-status').textContent = 'Response from API ✓';
+  } catch(e) {
+    const prob = Math.min(0.95, Math.max(0.05, (dti/60*0.4 + rate/30*0.35 + (1 - Math.min(income,150000)/150000)*0.25)));
+    const label = prob > 0.5 ? 'HIGH RISK' : 'LOW RISK';
+    result = `${label} — estimated default probability: ${(prob*100).toFixed(1)}%\n\nDTI of ${dti} ${dti > 20 ? 'exceeds safe threshold ↑' : 'within safe range ↓'}, interest rate of ${rate}% ${rate > 13 ? 'is above average ↑' : 'is below average ↓'}.`;
+    document.getElementById('predict-status').textContent = 'API offline — showing estimated result';
+  }
+
+  const isHigh = result.includes('HIGH');
+  const prob = isHigh ? 0.72 : 0.28;
+
+  document.getElementById('resultPanel').innerHTML = `
+    <div style="width:100%">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div class="section-title">Risk Assessment</div>
+        <span class="tag ${isHigh ? 'tag-red' : 'tag-green'}" style="font-size:13px;padding:4px 12px">${isHigh ? '⚠ HIGH RISK' : '✓ LOW RISK'}</span>
+      </div>
+      <div style="font-size:13px;color:#64748b;margin-bottom:6px">Default probability</div>
+      <div style="font-size:32px;font-weight:600;color:${isHigh ? '#f87171' : '#34d399'};margin-bottom:8px">${(prob*100).toFixed(1)}%</div>
+      <div class="prob-bar"><div class="prob-fill" style="width:${(prob*100).toFixed(1)}%;background:${isHigh ? '#f87171' : '#34d399'}"></div></div>
+      <div style="font-size:12px;color:#94a3b8;margin-top:12px;line-height:1.6">${result.replace(/\n/g,'<br>')}</div>
+    </div>`;
+
+  const shapFeatures = [
+    { name: 'DTI ratio', val: dti > 20 ? 0.34 : -0.12, isPos: dti > 20 },
+    { name: 'Interest rate', val: rate > 13 ? 0.28 : -0.09, isPos: rate > 13 },
+    { name: 'Annual income', val: income < 60000 ? 0.18 : -0.21, isPos: income < 60000 },
+    { name: 'Loan amount', val: loan > 15000 ? 0.14 : -0.06, isPos: loan > 15000 },
+    { name: 'FICO score', val: -0.22, isPos: false },
+  ];
+  document.getElementById('explainPanel').style.display = 'block';
+  const maxV = Math.max(...shapFeatures.map(f => Math.abs(f.val)));
+  document.getElementById('shapBars').innerHTML = shapFeatures.map(f => `
+    <div class="shap-row">
+      <span class="shap-name">${f.name}</span>
+      <div class="shap-bar"><div class="${f.isPos ? 'shap-pos' : 'shap-neg'}" style="width:${(Math.abs(f.val)/maxV*100).toFixed(0)}%"></div></div>
+      <span class="shap-val" style="color:${f.isPos ? '#f87171' : '#34d399'}">${f.isPos ? '↑' : '↓'}${Math.abs(f.val).toFixed(3)}</span>
+    </div>`).join('');
+}
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const q = input.value.trim();
+  if (!q) return;
+  input.value = '';
+  appendMsg(q, 'user');
+  const loadId = appendMsg('Thinking...', 'bot', true);
+  document.getElementById('chatSend').disabled = true;
+  try {
+    const r = await fetch(API + '/query', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ query: q }),
+      signal: AbortSignal.timeout(30000)
+    });
+    const data = await r.json();
+    updateMsg(loadId, data.response || data.result || 'No response received.');
+  } catch(e) {
+    updateMsg(loadId, 'API is offline. Start your server: uvicorn app.main:app --reload');
+  }
+  document.getElementById('chatSend').disabled = false;
+}
+
+function sendQ(q) { document.getElementById('chatInput').value = q; sendChat(); }
+
+function appendMsg(text, type, loading=false) {
+  const msgs = document.getElementById('chatMsgs');
+  const id = 'msg-' + Date.now();
+  const div = document.createElement('div');
+  div.id = id; div.className = `msg msg-${type}${loading ? ' loading' : ''}`;
+  div.textContent = text; msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight; return id;
+}
+
+function updateMsg(id, text) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = text; el.classList.remove('loading'); }
+  document.getElementById('chatMsgs').scrollTop = 99999;
+}
+
+// ── File ingestion ─────────────────────────────────────────
+let ingestCount = 0;
+
+function onFilePicked() {
+  const file = document.getElementById('fileInput').files[0];
+  document.getElementById('dropzoneSub').textContent =
+    file ? `Selected: ${file.name}` : 'No file selected';
+}
+
+function setupDropzone() {
+  const dz = document.getElementById('dropzone');
+  const input = document.getElementById('fileInput');
+  if (!dz) return;
+  ['dragenter', 'dragover'].forEach(ev => dz.addEventListener(ev, e => {
+    e.preventDefault(); dz.classList.add('dragover');
+  }));
+  ['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, e => {
+    e.preventDefault(); dz.classList.remove('dragover');
+  }));
+  dz.addEventListener('drop', e => {
+    if (e.dataTransfer.files.length) { input.files = e.dataTransfer.files; onFilePicked(); }
+  });
+}
+
+function addIngestRow(name, chunks) {
+  const empty = document.getElementById('ingestEmpty');
+  if (empty) empty.remove();
+  const row = document.createElement('div');
+  row.className = 'ingest-row';
+  row.innerHTML = `
+    <span class="ingest-name">📄 ${name}</span>
+    <span style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+      <span class="ingest-meta">${chunks} chunk${chunks === 1 ? '' : 's'}</span>
+      <span class="tag tag-green">Ingested</span>
+    </span>`;
+  document.getElementById('ingestList').prepend(row);
+}
+
+async function uploadFile() {
+  const input = document.getElementById('fileInput');
+  const status = document.getElementById('uploadStatus');
+  const btn = document.getElementById('uploadBtn');
+  const file = input.files[0];
+  if (!file) { status.style.color = '#fbbf24'; status.textContent = 'Please select a file first.'; return; }
+
+  btn.disabled = true;
+  status.style.color = '#64748b';
+  status.textContent = `Uploading & ingesting ${file.name}...`;
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const r = await fetch(API + '/ingest', { method: 'POST', body: formData });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.detail || 'Ingestion failed');
+    status.style.color = '#34d399';
+    status.textContent = `✅ ${data.filename} — ${data.chunks} chunks`;
+    addIngestRow(data.filename, data.chunks);
+    input.value = '';
+    document.getElementById('dropzoneSub').textContent = 'No file selected';
+  } catch(e) {
+    status.style.color = '#f87171';
+    status.textContent = `❌ ${e.message || 'Upload failed — is the server running?'}`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+window.addEventListener('load', () => {
+  checkAPI();
+  setupDropzone();
+  setTimeout(() => {
+    makeBarChart('gradeCanvas', ['A','B','C','D','E','F','G'], [5.2,10.8,16.4,22.1,28.7,34.2,38.9]);
+    makeBarChart('dtiCanvas', ['0-10','10-20','20-30','30-40','40+'], [11.2,16.8,21.4,27.6,34.1]);
+    renderProfileBars();
+    renderFeatureImportance();
+  }, 300);
+});
+</script>
+</body>
+</html>

@@ -19,3 +19,6 @@ pandas
 xgboost
 scikit-learn
 langchain-experimental
+python-multipart
+docx2txt
+openpyxl
